@@ -23,8 +23,26 @@ app.get("/api/notes", (req, res) => {
       console.log(err);
     } else {
       res.send(result);
-      console.log("RESULT", result);
     }
+  });
+});
+
+app.delete("/api/notes/:id", (req, res) => {
+  const id = req.params.id;
+  res.send("delete request called");
+  // Read file
+  fs.readFile("./db/db.json", (err, data) => {
+    err ? console.error(err) : console.log("READING:", data);
+    // Convert string into JSON object.
+    const parsedContent = JSON.parse(data);
+    console.log(parsedContent);
+
+    const leftOverNotes = parsedContent.filter((note) => {
+      if (note.id !== id) return note;
+    });
+    console.log("DELETED:", leftOverNotes);
+
+    // Rewrite notes to db.json file
   });
 });
 
@@ -34,7 +52,7 @@ app.post("/api/notes", (req, res) => {
   const newNote = {
     title,
     text,
-    note_id: randomUUID(),
+    id: randomUUID(),
   };
   // Then it returns the new note to the client.
   const readAndAppend = (content, filePath) => {
@@ -43,9 +61,7 @@ app.post("/api/notes", (req, res) => {
         console.error(err);
       } else {
         const parsedContent = JSON.parse(data);
-        console.log(parsedContent);
         parsedContent.push(content);
-        console.log("DATA", parsedContent);
         writeToFile("./db/db.json", parsedContent);
         res.send("success!");
       }
