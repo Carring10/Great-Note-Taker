@@ -41,8 +41,10 @@ app.delete("/api/notes/:id", (req, res) => {
       if (note.id !== id) return note;
     });
     console.log("DELETED:", leftOverNotes);
-
     // Rewrite notes to db.json file
+    fs.writeFile("./db/db.json", JSON.stringify(leftOverNotes), (err) =>
+      err ? console.error(err) : console.log("success")
+    );
   });
 });
 
